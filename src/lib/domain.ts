@@ -81,11 +81,11 @@ export const MESSAGE_VARIABLES = [
 ];
 
 export const PHASES = [
-  { key: "find", label: "Find Leads", to: "/app/lead-finder" },
-  { key: "audit", label: "Audit", to: "/app/audits" },
-  { key: "rank", label: "Rank", to: "/app/rankings" },
-  { key: "build", label: "Build", to: "/app/builder" },
-  { key: "outreach", label: "Outreach", to: "/app/outreach" },
+  { key: "find", label: "Find", to: "/lead-finder" },
+  { key: "audit", label: "Audit", to: "/audits" },
+  { key: "rank", label: "Rank", to: "/rankings" },
+  { key: "build", label: "Build", to: "/builder" },
+  { key: "outreach", label: "Outreach", to: "/outreach" },
 ] as const;
 
 export function gradeForScore(score: number): { grade: string; tone: "hot" | "accent" | "fog" | "warn" | "muted" } {
