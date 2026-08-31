@@ -167,6 +167,13 @@ export const findLeads = createServerFn({ method: "POST" })
         google_maps_url: null,
       }));
     } else {
+      // Over-fetch when post-filters are active so we can still hit the requested count.
+      const filtersActive =
+        data.minReviews > 0 || data.hasWebsite !== "any" || data.hasPhone || data.hasEmail || data.hasSocial || Boolean(data.keyword);
+      const requested = Math.min(200, filtersActive ? data.count * 3 : data.count);
+      // The actor supports a native minimum-stars filter; everything else is applied locally.
+      const minStars =
+        data.minRating >= 4.5 ? "4.5" : data.minRating >= 4 ? "four" : data.minRating >= 3 ? "three" : data.minRating >= 2 ? "two" : undefined;
       try {
         const response = await fetch(
           `https://api.apify.com/v2/acts/compass~crawler-google-places/run-sync-get-dataset-items?token=${apifyToken}&timeout=280`,
@@ -176,24 +183,35 @@ export const findLeads = createServerFn({ method: "POST" })
             body: JSON.stringify({
               searchStringsArray: [data.keyword ? `${data.niche} ${data.keyword}` : data.niche],
               locationQuery: [data.city, data.state, data.country].filter(Boolean).join(", "),
-              maxCrawledPlacesPerSearch: data.count,
+              maxCrawledPlacesPerSearch: requested,
               language: "en",
               skipClosedPlaces: true,
+              scrapeContacts: false,
+              ...(minStars ? { placeMinimumStars: minStars } : {}),
             }),
           },
         );
         if (!response.ok) {
-          console.error(`Apify error ${response.status}: ${await response.text()}`);
-          return await fail("The lead source rejected this request. Check your Apify configuration and retry.");
+          const detail = await response.text();
+          console.error(`Apify error ${response.status}: ${detail.slice(0, 500)}`);
+          const message =
+            response.status === 401 || response.status === 403
+              ? "The lead source rejected the credentials. Check the Apify token in Settings."
+              : response.status === 429
+                ? "The lead source is rate limited right now. Please retry in a minute."
+                : "The lead source rejected this request. Check your Apify configuration and retry.";
+          return await fail(message);
         }
         const items = (await response.json()) as unknown[];
         candidates = items
           .map((item) => normalizeApifyItem(item, { city: data.city, state: data.state, country: data.country }))
           .filter((x): x is NormalizedLead => x !== null);
-      } catch {
+      } catch (error) {
+        console.error("Apify request failed", error);
         return await fail("The lead source could not be reached. Please retry in a moment.");
       }
     }
+
 
     const totalFound = candidates.length;
     const filtered = candidates.filter((lead) => passesFilters(lead, data)).slice(0, data.count);

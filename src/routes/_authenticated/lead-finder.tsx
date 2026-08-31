@@ -62,8 +62,9 @@ function LeadFinderPage() {
   const run = useMutation({
     mutationFn: async (source: "live" | "demo") => {
       if (!workspaceId) throw new Error("No workspace selected.");
-      return find({ data: { workspaceId, source, ...form } });
+      return find({ data: { workspaceId, source: source === "live" ? "apify" : "demo", ...form } });
     },
+
     onSuccess: (result) => {
       if (!result.ok) {
         toast.error(result.error);
