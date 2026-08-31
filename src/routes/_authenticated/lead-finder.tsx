@@ -5,7 +5,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Radar as RadarIcon, Sparkles } from "lucide-react";
 import { findLeads, getIntegrationStatus } from "@/lib/leads.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/hooks/useApp";
+
 import { Panel, PageHeader, Radar } from "@/components/app/primitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +45,24 @@ function LeadFinderPage() {
     queryKey: ["integrations"],
     queryFn: () => status({}),
   });
+
+  const { data: recentJobs = [] } = useQuery({
+    queryKey: ["scrape-jobs", workspaceId],
+    enabled: Boolean(workspaceId),
+    refetchInterval: (query) =>
+      (query.state.data ?? []).some((j) => j.status === "pending" || j.status === "running") ? 3000 : false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("scrape_jobs")
+        .select("id, query, status, source, total_found, total_saved, created_at")
+        .eq("workspace_id", workspaceId!)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data;
+    },
+  });
+
 
   const [form, setForm] = useState({
     niche: "Dentists",
