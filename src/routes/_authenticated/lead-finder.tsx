@@ -5,7 +5,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Radar as RadarIcon, Sparkles } from "lucide-react";
 import { findLeads, getIntegrationStatus } from "@/lib/leads.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/hooks/useApp";
+
 import { Panel, PageHeader, Radar } from "@/components/app/primitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +46,24 @@ function LeadFinderPage() {
     queryFn: () => status({}),
   });
 
+  const { data: recentJobs = [] } = useQuery({
+    queryKey: ["scrape-jobs", workspaceId],
+    enabled: Boolean(workspaceId),
+    refetchInterval: (query) =>
+      (query.state.data ?? []).some((j) => j.status === "pending" || j.status === "running") ? 3000 : false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("scrape_jobs")
+        .select("id, query, status, source, total_found, total_saved, created_at")
+        .eq("workspace_id", workspaceId!)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+
   const [form, setForm] = useState({
     niche: "Dentists",
     city: "Ahmedabad",
@@ -62,8 +82,9 @@ function LeadFinderPage() {
   const run = useMutation({
     mutationFn: async (source: "live" | "demo") => {
       if (!workspaceId) throw new Error("No workspace selected.");
-      return find({ data: { workspaceId, source, ...form } });
+      return find({ data: { workspaceId, source: source === "live" ? "apify" : "demo", ...form } });
     },
+
     onSuccess: (result) => {
       if (!result.ok) {
         toast.error(result.error);
@@ -184,6 +205,38 @@ function LeadFinderPage() {
                 : "Ready. Live scanning pulls fresh Google Maps data; demo data uses a fictional Ahmedabad dental dataset."}
             </p>
           </Panel>
+
+          <Panel>
+            <p className="label-mono">Recent scans</p>
+            {recentJobs.length === 0 ? (
+              <p className="mt-3 text-sm text-muted-foreground">No scans yet.</p>
+            ) : (
+              <ul className="mt-3 space-y-2.5 text-sm">
+                {recentJobs.map((job) => (
+                  <li key={job.id} className="flex items-start justify-between gap-3">
+                    <span className="min-w-0">
+                      <span className="block truncate text-foreground">{job.query}</span>
+                      <span className="font-mono text-[11px] text-muted-foreground">
+                        {job.source === "demo" ? "demo" : "live"} · {job.total_saved} saved / {job.total_found} found
+                      </span>
+                    </span>
+                    <span
+                      className={
+                        job.status === "completed"
+                          ? "font-mono text-[11px] text-accent"
+                          : job.status === "failed"
+                            ? "font-mono text-[11px] text-hot"
+                            : "font-mono text-[11px] text-muted-foreground"
+                      }
+                    >
+                      {job.status}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
 
           <Panel>
             <p className="label-mono">Integrations</p>
