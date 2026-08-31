@@ -30,6 +30,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [confirmSent, setConfirmSent] = useState(false);
 
   useEffect(() => {
     if (!loading && user) void navigate({ to: "/dashboard" });
@@ -97,6 +98,12 @@ function AuthPage() {
           <h1 className="mt-1.5 text-lg font-semibold text-foreground">
             {mode === "signin" ? "Sign in to LeadPilot" : "Start your free workspace"}
           </h1>
+
+          {confirmSent ? (
+            <p className="mt-3 rounded-md border border-accent/30 bg-accent/10 px-3 py-2 text-xs text-foreground">
+              We sent a confirmation link to your email. Confirm it, then sign in below.
+            </p>
+          ) : null}
 
           <form onSubmit={submit} className="mt-6 space-y-4">
             {mode === "signup" ? (
