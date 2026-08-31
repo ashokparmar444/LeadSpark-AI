@@ -168,7 +168,7 @@ export const rankLeads = createServerFn({ method: "POST" })
     const { supabase, userId } = context as unknown as Ctx & { supabase: any };
     try {
       await assertMember(supabase, data.workspaceId);
-      await assertWithinLimit(supabase, data.workspaceId, "ranking", data.leadIds.length);
+      await assertWithinLimit(supabase, data.workspaceId, "ranking", 1);
     } catch (error) {
       return { ok: false as const, error: friendlyError(error) };
     }
@@ -246,7 +246,8 @@ ${untrusted("businesses", JSON.stringify(leads))}`;
       operation: "ranking",
       provider: provider.id,
       model: provider.model,
-      credits: updated,
+      credits: 1,
+      meta: { lead_count: updated },
     });
 
     return { ok: true as const, updated };
