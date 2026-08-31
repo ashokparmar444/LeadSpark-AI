@@ -29,7 +29,7 @@ function AdminPage() {
       const [jobs, usage, members] = await Promise.all([
         supabase
           .from("scrape_jobs")
-          .select("id, query, status, results_count, created_at")
+          .select("id, query, status, total_saved, created_at")
           .eq("workspace_id", workspaceId!)
           .order("created_at", { ascending: false })
           .limit(20),
@@ -80,7 +80,7 @@ function AdminPage() {
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="font-mono text-[11px] text-muted-foreground">{job.status}</p>
-                  <p className="font-mono text-[11px] text-foreground">{job.results_count ?? 0} results</p>
+                  <p className="font-mono text-[11px] text-foreground">{job.total_saved ?? 0} results</p>
                 </div>
               </li>
             ))}
