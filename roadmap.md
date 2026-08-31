@@ -23,7 +23,7 @@
 - [x] 16. Credits/usage enforcement
 - [x] 17. Dashboard + Analytics charts
 - [x] 18. Settings + Billing + Admin
-- [ ] 19. Security/QA pass
+- [x] 19. Security/QA pass (end-to-end verified: demo scan → audit → rank → builder → outreach)
 
 ## Notes
 - Stack is TanStack Start: server logic uses createServerFn, not edge functions.

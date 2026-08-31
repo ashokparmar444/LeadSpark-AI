@@ -45,14 +45,16 @@ export async function assertWithinLimit(supabase: SupabaseClient, workspaceId: s
 
   const limit = (plan as Record<string, number> | null)?.[LIMIT_COLUMN[op]] ?? 0;
 
-  const { count } = await supabase
+  // Credits, not rows: a batch operation records one row worth many credits.
+  const { data: rows } = await supabase
     .from("ai_usage")
-    .select("id", { count: "exact", head: true })
+    .select("credits")
     .eq("workspace_id", workspaceId)
     .eq("operation", op)
     .gte("created_at", periodStart());
+  const used = (rows ?? []).reduce((sum: number, r: { credits: number | null }) => sum + (r.credits ?? 1), 0);
 
-  if ((count ?? 0) + cost > limit) {
+  if (used + cost > limit) {
     throw new UsageError(
       `You have reached your monthly AI limit for this operation (${limit} on the ${plan?.name ?? "Free"} plan). Upgrade your plan or wait for the reset.`,
     );
