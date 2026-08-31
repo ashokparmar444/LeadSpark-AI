@@ -187,6 +187,38 @@ function LeadFinderPage() {
           </Panel>
 
           <Panel>
+            <p className="label-mono">Recent scans</p>
+            {recentJobs.length === 0 ? (
+              <p className="mt-3 text-sm text-muted-foreground">No scans yet.</p>
+            ) : (
+              <ul className="mt-3 space-y-2.5 text-sm">
+                {recentJobs.map((job) => (
+                  <li key={job.id} className="flex items-start justify-between gap-3">
+                    <span className="min-w-0">
+                      <span className="block truncate text-foreground">{job.query}</span>
+                      <span className="font-mono text-[11px] text-muted-foreground">
+                        {job.source === "demo" ? "demo" : "live"} · {job.total_saved} saved / {job.total_found} found
+                      </span>
+                    </span>
+                    <span
+                      className={
+                        job.status === "completed"
+                          ? "font-mono text-[11px] text-accent"
+                          : job.status === "failed"
+                            ? "font-mono text-[11px] text-hot"
+                            : "font-mono text-[11px] text-muted-foreground"
+                      }
+                    >
+                      {job.status}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+
+
+          <Panel>
             <p className="label-mono">Integrations</p>
             <ul className="mt-3 space-y-2 text-sm">
               <IntegrationRow label="Live scraping" ok={integrations?.apifyConfigured} />
