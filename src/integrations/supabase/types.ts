@@ -1061,6 +1061,9 @@ export type Database = {
           name: string
           platform: string
           prompt: string | null
+          published_at: string | null
+          site_html: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["project_status"]
           strategy: Json
           updated_at: string
@@ -1074,6 +1077,9 @@ export type Database = {
           name: string
           platform?: string
           prompt?: string | null
+          published_at?: string | null
+          site_html?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           strategy?: Json
           updated_at?: string
@@ -1087,6 +1093,9 @@ export type Database = {
           name?: string
           platform?: string
           prompt?: string | null
+          published_at?: string | null
+          site_html?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           strategy?: Json
           updated_at?: string
