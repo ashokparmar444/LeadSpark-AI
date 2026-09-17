@@ -1,12 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 
-const getPublishedSite = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => z.object({ slug: z.string().min(3).max(64).regex(/^[a-z0-9-]+$/) }).parse(data))
-  .handler(async ({ data }) => {
+async function getPublishedSite(slugValue: string) {
+    const data = z.object({ slug: z.string().min(3).max(64).regex(/^[a-z0-9-]+$/) }).parse({ slug: slugValue });
     const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
     const url = process.env["SUPABASE_URL"];
     if (!key || !url) return null;
@@ -29,13 +27,13 @@ const getPublishedSite = createServerFn({ method: "GET" })
       .not("published_at", "is", null)
       .maybeSingle();
     return site?.site_html ?? null;
-  });
+}
 
 export const Route = createFileRoute("/sites/$slug")({
   server: {
     handlers: {
       GET: async ({ params }) => {
-        const html = await getPublishedSite({ data: { slug: params.slug } });
+        const html = await getPublishedSite(params.slug);
         if (!html) return new Response("Site not found", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8" } });
         return new Response(html, {
           headers: {
