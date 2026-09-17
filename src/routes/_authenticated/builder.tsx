@@ -3,10 +3,10 @@ import { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Blocks, Copy } from "lucide-react";
+import { Blocks, Copy, ExternalLink, Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/hooks/useApp";
-import { generateWebsiteStrategy } from "@/lib/ai.functions";
+import { generateWebsiteStrategy, publishWebsiteProject } from "@/lib/ai.functions";
 import { PageHeader, Panel, EmptyState } from "@/components/app/primitives";
 import { Button } from "@/components/ui/button";
 import { BUILDER_PLATFORMS } from "@/lib/domain";
@@ -37,6 +37,7 @@ function BuilderPage() {
   const { workspaceId } = useApp();
   const queryClient = useQueryClient();
   const generate = useServerFn(generateWebsiteStrategy);
+  const publish = useServerFn(publishWebsiteProject);
   const [leadId, setLeadId] = useState("");
   const [platform, setPlatform] = useState<Platform>("lovable");
 
@@ -73,6 +74,20 @@ function BuilderPage() {
       void queryClient.invalidateQueries();
     },
     onError: () => toast.error("The strategy could not be generated."),
+  });
+
+  const deploy = useMutation({
+    mutationFn: async (projectId: string) => publish({ data: { workspaceId: workspaceId!, projectId } }),
+    onSuccess: (result) => {
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Demo site is live.");
+      void queryClient.invalidateQueries({ queryKey: ["builder", workspaceId] });
+      window.open(result.url, "_blank", "noopener,noreferrer");
+    },
+    onError: () => toast.error("The site could not be published."),
   });
 
   return (
@@ -142,6 +157,7 @@ function BuilderPage() {
               hero_headline?: string;
               sales_pitch?: string[];
             };
+            const liveUrl = project.slug ? `/sites/${project.slug}` : project.demo_url;
             return (
               <Panel key={project.id}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -151,16 +167,33 @@ function BuilderPage() {
                       {project.platform} · {new Date(project.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => {
-                      void navigator.clipboard.writeText(project.prompt ?? "");
-                      toast.success("Builder prompt copied.");
-                    }}
-                  >
-                    <Copy className="mr-1.5 size-3.5" /> Copy prompt
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        void navigator.clipboard.writeText(project.prompt ?? "");
+                        toast.success("Builder prompt copied.");
+                      }}
+                    >
+                      <Copy className="mr-1.5 size-3.5" /> Copy prompt
+                    </Button>
+                    {project.status === "published" && liveUrl ? (
+                      <Button asChild size="sm">
+                        <a href={liveUrl} target="_blank" rel="noreferrer">
+                          <ExternalLink className="mr-1.5 size-3.5" /> View live site
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => deploy.mutate(project.id)}
+                        disabled={deploy.isPending}
+                      >
+                        <Rocket className="mr-1.5 size-3.5" /> {deploy.isPending ? "Publishing…" : "Publish site"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 {strategy.hero_headline ? (
                   <p className="mt-3 text-sm text-foreground">“{strategy.hero_headline}”</p>
