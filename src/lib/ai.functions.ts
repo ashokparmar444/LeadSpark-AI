@@ -261,6 +261,55 @@ const buildSchema = z.object({
   platform: z.enum(["lovable", "bolt", "claude-code", "custom"]),
 });
 
+const publishSiteSchema = z.object({
+  workspaceId: z.string().uuid(),
+  projectId: z.string().uuid(),
+});
+
+export const publishWebsiteProject = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => publishSiteSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as unknown as Ctx & { supabase: any };
+    try {
+      await assertMember(supabase, data.workspaceId);
+    } catch (error) {
+      return { ok: false as const, error: friendlyError(error) };
+    }
+
+    const { data: project } = await supabase
+      .from("website_projects")
+      .select("id, lead_id, name, strategy, slug, leads(business_name, category, phone, email, address, city, state, country, google_rating, review_count, google_maps_url)")
+      .eq("id", data.projectId)
+      .eq("workspace_id", data.workspaceId)
+      .maybeSingle();
+    if (!project) return { ok: false as const, error: "Website project not found." };
+
+    const leadValue = Array.isArray(project.leads) ? project.leads[0] : project.leads;
+    if (!leadValue) return { ok: false as const, error: "The linked lead could not be found." };
+
+    const { renderSiteHtml, slugify } = await import("@/lib/site-render.server");
+    const slug = project.slug || `${slugify(leadValue.business_name)}-${project.id.slice(0, 8)}`;
+    const html = renderSiteHtml(leadValue, (project.strategy ?? {}) as Record<string, unknown>);
+    const publishedAt = new Date().toISOString();
+    const { error } = await supabase
+      .from("website_projects")
+      .update({ slug, site_html: html, status: "published", published_at: publishedAt, demo_url: `/sites/${slug}` })
+      .eq("id", project.id)
+      .eq("workspace_id", data.workspaceId);
+    if (error) return { ok: false as const, error: "The site could not be published. Please retry." };
+
+    await supabase.from("lead_activity").insert({
+      workspace_id: data.workspaceId,
+      lead_id: project.lead_id,
+      user_id: userId,
+      type: "publish",
+      message: `Demo website published · ${leadValue.business_name}`,
+    });
+
+    return { ok: true as const, url: `/sites/${slug}` };
+  });
+
 export const generateWebsiteStrategy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => buildSchema.parse(data))

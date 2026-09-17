@@ -24,6 +24,7 @@
 - [x] 17. Dashboard + Analytics charts
 - [x] 18. Settings + Billing + Admin
 - [x] 19. Security/QA pass (end-to-end verified: demo scan → audit → rank → builder → outreach)
+- [x] 20. One-click public demo-site publishing from generated website copy
 
 ## Notes
 - Stack is TanStack Start: server logic uses createServerFn, not edge functions.
