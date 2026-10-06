@@ -25,9 +25,10 @@
 - [x] 18. Settings + Billing + Admin
 - [x] 19. Security/QA pass (end-to-end verified: demo scan → audit → rank → builder → outreach)
 - [x] 20. One-click public demo-site publishing from generated website copy
-- [ ] 21. Team client portal for workspace leads, audits and outreach messages
-- [ ] 22. Real outreach email delivery with sender-domain setup and delivery tracking
+- [x] 21. Team client portal for workspace leads, audits and outreach messages
+- [ ] 22. Real outreach email delivery with sender-domain setup and delivery tracking (blocked: needs sender domain + backend resumed)
 
 ## Notes
 - Stack is TanStack Start: server logic uses createServerFn, not edge functions.
 - Never expose Apify/AI keys client-side.
+- [ ] 23. Publish Jaipur plumber demo site and verify public link (blocked: backend paused)
