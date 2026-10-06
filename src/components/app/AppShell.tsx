@@ -41,6 +41,7 @@ const NAV = [
   { to: "/outreach", label: "Outreach", icon: Send },
   { to: "/campaigns", label: "Campaigns", icon: Megaphone },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/portal", label: "Team Portal", icon: Users },
 ] as const;
 
 const FOOT_NAV = [

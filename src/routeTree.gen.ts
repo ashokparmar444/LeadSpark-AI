@@ -21,6 +21,7 @@ import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLeadFinderRouteImport } from './routes/_authenticated/lead-finder'
 import { Route as AuthenticatedOutreachRouteImport } from './routes/_authenticated/outreach'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedRankingsRouteImport } from './routes/_authenticated/rankings'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as SitesSlugRouteImport } from './routes/sites.$slug'
@@ -86,6 +87,11 @@ const AuthenticatedOutreachRoute = AuthenticatedOutreachRouteImport.update({
   path: '/outreach',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRankingsRoute = AuthenticatedRankingsRouteImport.update({
   id: '/rankings',
   path: '/rankings',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/lead-finder': typeof AuthenticatedLeadFinderRoute
   '/outreach': typeof AuthenticatedOutreachRoute
+  '/portal': typeof AuthenticatedPortalRoute
   '/rankings': typeof AuthenticatedRankingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sites/$slug': typeof SitesSlugRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/lead-finder': typeof AuthenticatedLeadFinderRoute
   '/outreach': typeof AuthenticatedOutreachRoute
+  '/portal': typeof AuthenticatedPortalRoute
   '/rankings': typeof AuthenticatedRankingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sites/$slug': typeof SitesSlugRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/lead-finder': typeof AuthenticatedLeadFinderRoute
   '/_authenticated/outreach': typeof AuthenticatedOutreachRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/rankings': typeof AuthenticatedRankingsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/sites/$slug': typeof SitesSlugRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/lead-finder'
     | '/outreach'
+    | '/portal'
     | '/rankings'
     | '/settings'
     | '/sites/$slug'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/lead-finder'
     | '/outreach'
+    | '/portal'
     | '/rankings'
     | '/settings'
     | '/sites/$slug'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/lead-finder'
     | '/_authenticated/outreach'
+    | '/_authenticated/portal'
     | '/_authenticated/rankings'
     | '/_authenticated/settings'
     | '/sites/$slug'
@@ -319,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOutreachRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rankings': {
       id: '/_authenticated/rankings'
       path: '/rankings'
@@ -367,6 +386,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLeadFinderRoute: typeof AuthenticatedLeadFinderRoute
   AuthenticatedOutreachRoute: typeof AuthenticatedOutreachRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedRankingsRoute: typeof AuthenticatedRankingsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedLeadsIdRoute: typeof AuthenticatedLeadsIdRoute
@@ -383,6 +403,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLeadFinderRoute: AuthenticatedLeadFinderRoute,
   AuthenticatedOutreachRoute: AuthenticatedOutreachRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedRankingsRoute: AuthenticatedRankingsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedLeadsIdRoute: AuthenticatedLeadsIdRoute,
