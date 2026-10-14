@@ -5,7 +5,8 @@
 - [x] Lovable Cloud enabled
 
 ## Build order
-- [ ] Replace one-click publishing with saved copy editing, live preview and explicit publishing.
+- [x] Replace one-click publishing with copy editing, live preview, save-draft and explicit publishing controls.
+- [ ] Verify saved edits and publishing with real workspace data (blocked: backend paused; editor interactions verified separately).
 - [x] 1. Design system tokens (src/styles.css) + fonts
 - [x] 2. Database schema + RLS + plans seed
 - [x] 3. Auth (email/password + Google) + protected layout
