@@ -23,7 +23,7 @@ export function toSiteCopy(value: unknown): SiteCopy {
     hero_headline: text("hero_headline", 160), hero_subheadline: text("hero_subheadline", 300),
     cta: text("cta", 120), services: list("services", 9), about: text("about", 900),
     testimonials: list("testimonials", 3), contact: text("contact", 500), strategy: text("strategy", 1500),
-    faq: Array.isArray(source.faq) ? source.faq.slice(0, 6).map((item) => ({
+    faq: Array.isArray(source["faq"]) ? source["faq"].slice(0, 6).map((item) => ({
       q: String(item?.q ?? "").slice(0, 200), a: String(item?.a ?? "").slice(0, 500),
     })) : [],
   };
