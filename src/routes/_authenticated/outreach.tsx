@@ -31,6 +31,8 @@ export const Route = createFileRoute("/_authenticated/outreach")({
       { name: "description", content: "Draft personalised multi-step outreach in English, Hinglish, Hindi or Gujarati across email and social channels." },
       { property: "og:title", content: "Outreach — LeadPilot AI" },
       { property: "og:description", content: "AI outreach sequences built from real audit findings." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

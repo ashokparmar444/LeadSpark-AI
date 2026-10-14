@@ -3,10 +3,11 @@ import { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Blocks, Copy, ExternalLink, Rocket } from "lucide-react";
+import { Blocks, Copy, ExternalLink, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useApp } from "@/hooks/useApp";
-import { generateWebsiteStrategy, publishWebsiteProject } from "@/lib/ai.functions";
+import { generateWebsiteStrategy } from "@/lib/ai.functions";
+import { SiteEditor } from "@/components/app/SiteEditor";
 import { PageHeader, Panel, EmptyState } from "@/components/app/primitives";
 import { Button } from "@/components/ui/button";
 import { BUILDER_PLATFORMS } from "@/lib/domain";
@@ -24,9 +25,11 @@ export const Route = createFileRoute("/_authenticated/builder")({
   head: () => ({
     meta: [
       { title: "Website Builder — LeadPilot AI" },
-      { name: "description", content: "Generate a full website strategy and a copy-paste builder prompt for Lovable, Bolt or Claude Code." },
+      { name: "description", content: "Generate, edit and preview local business website copy, then publish your approved site." },
       { property: "og:title", content: "Website Builder — LeadPilot AI" },
       { property: "og:description", content: "Turn an audit into a demo-site build prompt in seconds." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -37,7 +40,7 @@ function BuilderPage() {
   const { workspaceId } = useApp();
   const queryClient = useQueryClient();
   const generate = useServerFn(generateWebsiteStrategy);
-  const publish = useServerFn(publishWebsiteProject);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [leadId, setLeadId] = useState("");
   const [platform, setPlatform] = useState<Platform>("lovable");
 
@@ -45,26 +48,31 @@ function BuilderPage() {
     queryKey: ["builder", workspaceId],
     enabled: Boolean(workspaceId),
     queryFn: async () => {
+      if (!workspaceId) return { leads: [], projects: [] };
       const [leads, projects] = await Promise.all([
         supabase
           .from("leads")
           .select("id, business_name, city")
-          .eq("workspace_id", workspaceId!)
+          .eq("workspace_id", workspaceId)
           .order("opportunity_score", { ascending: false, nullsFirst: false })
           .limit(200),
         supabase
           .from("website_projects")
-          .select("*, leads(business_name)")
-          .eq("workspace_id", workspaceId!)
+          .select("*, leads(business_name, category, phone, email, address, city, state, country, google_rating, review_count, google_maps_url)")
+          .eq("workspace_id", workspaceId)
           .order("created_at", { ascending: false })
           .limit(30),
       ]);
+      if (leads.error || projects.error) throw new Error("Website projects could not be loaded.");
       return { leads: leads.data ?? [], projects: projects.data ?? [] };
     },
   });
 
   const run = useMutation({
-    mutationFn: async () => generate({ data: { workspaceId: workspaceId!, leadId, platform } }),
+    mutationFn: async () => {
+      if (!workspaceId) throw new Error("Choose a workspace first.");
+      return generate({ data: { workspaceId, leadId, platform } });
+    },
     onSuccess: (result) => {
       if (!result.ok) {
         toast.error(result.error);
@@ -76,26 +84,14 @@ function BuilderPage() {
     onError: () => toast.error("The strategy could not be generated."),
   });
 
-  const deploy = useMutation({
-    mutationFn: async (projectId: string) => publish({ data: { workspaceId: workspaceId!, projectId } }),
-    onSuccess: (result) => {
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
-      }
-      toast.success("Demo site is live.");
-      void queryClient.invalidateQueries({ queryKey: ["builder", workspaceId] });
-      window.open(result.url, "_blank", "noopener,noreferrer");
-    },
-    onError: () => toast.error("The site could not be published."),
-  });
+  const editingProject = data?.projects.find((project) => project.id === editingId);
 
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow="Phase 04"
         title="Website builder"
-        description="A full site strategy plus a self-contained builder prompt you can paste straight into your tool of choice."
+        description="Website projects"
       />
 
       <Panel>
@@ -168,6 +164,9 @@ function BuilderPage() {
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => setEditingId(project.id)}>
+                      <Pencil className="mr-1.5 size-3.5" /> Edit site
+                    </Button>
                     <Button
                       size="sm"
                       variant="secondary"
@@ -184,15 +183,7 @@ function BuilderPage() {
                           <ExternalLink className="mr-1.5 size-3.5" /> View live site
                         </a>
                       </Button>
-                    ) : (
-                      <Button
-                        size="sm"
-                        onClick={() => deploy.mutate(project.id)}
-                        disabled={deploy.isPending}
-                      >
-                        <Rocket className="mr-1.5 size-3.5" /> {deploy.isPending ? "Publishing…" : "Publish site"}
-                      </Button>
-                    )}
+                    ) : null}
                   </div>
                 </div>
                 {strategy.hero_headline ? (
@@ -220,6 +211,16 @@ function BuilderPage() {
             );
           })}
         </div>
+      )}
+      {workspaceId && editingProject?.leads && (
+        <SiteEditor
+          key={`${workspaceId}:${editingProject.id}`}
+          workspaceId={workspaceId}
+          project={editingProject}
+          business={editingProject.leads}
+          onClose={() => setEditingId(null)}
+          onSaved={() => { void queryClient.invalidateQueries({ queryKey: ["builder", workspaceId] }); }}
+        />
       )}
     </div>
   );

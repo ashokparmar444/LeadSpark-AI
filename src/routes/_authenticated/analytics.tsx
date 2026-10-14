@@ -12,6 +12,8 @@ export const Route = createFileRoute("/_authenticated/analytics")({
       { name: "description", content: "Conversion funnel, audit averages and AI usage across your LeadPilot workspace." },
       { property: "og:title", content: "Analytics — LeadPilot AI" },
       { property: "og:description", content: "Measure the pipeline from lead found to client won." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -1,4 +1,5 @@
-// Server-only renderer that turns an AI website strategy into a standalone,
+// Pure renderer shared by the copy editor and published site snapshot.
+// Turns an AI website strategy into a standalone,
 // self-contained HTML document. Every value coming from the model or from a
 // scraped lead is HTML-escaped — no script tags or event handlers can survive.
 
@@ -123,6 +124,7 @@ export function renderSiteHtml(
 <meta property="og:type" content="website" />
 <meta property="og:title" content="${esc(name)}" />
 <meta property="og:description" content="${esc(description)}" />
+<meta name="twitter:card" content="summary_large_image" />
 ${options.canonical ? `<link rel="canonical" href="${esc(options.canonical)}" />` : ""}
 <style>
 :root{--accent:hsl(${hue} 82% 46%);--accent-soft:hsl(${hue} 82% 96%);--ink:#0d1117;--muted:#5a6472;--line:#e6e9ef}

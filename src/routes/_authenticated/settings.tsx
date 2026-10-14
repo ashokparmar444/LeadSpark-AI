@@ -23,6 +23,8 @@ export const Route = createFileRoute("/_authenticated/settings")({
       { name: "description", content: "Manage your workspace name, team members and AI provider preferences." },
       { property: "og:title", content: "Settings — LeadPilot AI" },
       { property: "og:description", content: "Workspace, team and AI configuration." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -26,6 +26,8 @@ export const Route = createFileRoute("/_authenticated/leads/$id")({
       { name: "description", content: "Full profile, audit results, website strategy and outreach history for a single lead." },
       { property: "og:title", content: "Lead detail — LeadPilot AI" },
       { property: "og:description", content: "Audit, rank, build and convert a single local business lead." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

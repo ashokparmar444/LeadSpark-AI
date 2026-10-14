@@ -16,6 +16,8 @@ export const Route = createFileRoute("/_authenticated/rankings")({
       { name: "description", content: "Opportunity scores ranking every lead from hottest to coldest so your team works the best first." },
       { property: "og:title", content: "Rankings — LeadPilot AI" },
       { property: "og:description", content: "AI opportunity ranking for local business leads." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

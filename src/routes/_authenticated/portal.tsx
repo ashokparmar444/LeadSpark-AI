@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_authenticated/portal")({
       { name: "description", content: "Shared read-only view of this workspace's leads, audits and outreach messages for your team." },
       { property: "og:title", content: "Team Portal — LeadPilot AI" },
       { property: "og:description", content: "Workspace leads, audits and outreach in one shared view." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

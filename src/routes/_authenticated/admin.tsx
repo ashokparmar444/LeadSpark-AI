@@ -12,6 +12,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { name: "description", content: "Owner-only view of workspace activity, scrape jobs and AI operations." },
       { property: "og:title", content: "Admin — LeadPilot AI" },
       { property: "og:description", content: "Owner-only workspace operations view." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
