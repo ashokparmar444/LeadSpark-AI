@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "description", content: "Your live lead pipeline: leads found, audits run, hot opportunities and outreach sent." },
       { property: "og:title", content: "Dashboard — LeadPilot AI" },
       { property: "og:description", content: "Track the five-phase lead pipeline in one console." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

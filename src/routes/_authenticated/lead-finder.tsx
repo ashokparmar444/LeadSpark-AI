@@ -28,6 +28,8 @@ export const Route = createFileRoute("/_authenticated/lead-finder")({
       { name: "description", content: "Scan any niche in any city for local business leads with filters for rating, reviews, website and contact details." },
       { property: "og:title", content: "Lead Finder — LeadPilot AI" },
       { property: "og:description", content: "Find local business leads by niche and city." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

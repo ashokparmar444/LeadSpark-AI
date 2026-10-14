@@ -24,6 +24,8 @@ export const Route = createFileRoute("/_authenticated/campaigns")({
       { name: "description", content: "Group leads into outreach campaigns and track their progress from draft to closed." },
       { property: "og:title", content: "Campaigns — LeadPilot AI" },
       { property: "og:description", content: "Organise outreach into trackable campaigns." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -16,6 +16,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to your LeadPilot AI workspace to find, audit and convert local business leads." },
       { property: "og:title", content: "Sign in — LeadPilot AI" },
       { property: "og:description", content: "Access your LeadPilot AI lead pipeline." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -16,6 +16,8 @@ export const Route = createFileRoute("/_authenticated/audits")({
       { name: "description", content: "AI website audits scoring design, mobile, SEO, conversion and trust for every lead." },
       { property: "og:title", content: "Audits — LeadPilot AI" },
       { property: "og:description", content: "Website audit scores across your lead database." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

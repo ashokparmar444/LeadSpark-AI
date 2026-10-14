@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/billing")({
       { name: "description", content: "Your plan, monthly limits and AI credit usage for this LeadPilot workspace." },
       { property: "og:title", content: "Billing — LeadPilot AI" },
       { property: "og:description", content: "Plan limits and credit usage." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
