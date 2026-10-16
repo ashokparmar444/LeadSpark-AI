@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_authenticated/leads/$id")({
   head: () => ({
@@ -42,6 +44,8 @@ function LeadDetailPage() {
   const runBuild = useServerFn(generateWebsiteStrategy);
   const runOutreach = useServerFn(generateOutreach);
   const [note, setNote] = useState("");
+  const [clientUsername, setClientUsername] = useState(lead?.client_username ?? "");
+  const [clientPassword, setClientPassword] = useState(lead?.client_password ?? "");
 
   const { data, isLoading } = useQuery({
     queryKey: ["lead", id],
@@ -154,6 +158,35 @@ function LeadDetailPage() {
     invalidate();
   };
 
+  const saveClientLogin = async () => {
+    if (!workspaceId) return;
+    const { error } = await supabase
+      .from("leads")
+      .update({ client_username: clientUsername, client_password: clientPassword })
+      .eq("id", id);
+    if (error) {
+      toast.error("Could not save client login.");
+      return;
+    }
+    toast.success("Client login saved.");
+    invalidate();
+  };
+
+  const sendInvite = async () => {
+    if (!workspaceId || !lead?.email) return;
+    // Simulate sending invite by updating timestamp
+    const { error } = await supabase
+      .from("leads")
+      .update({ invite_sent_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) {
+      toast.error("Could not send invite.");
+      return;
+    }
+    toast.success(`Invite sent to ${lead.email}`);
+    invalidate();
+  };
+
   if (isLoading) {
     return <p className="text-sm text-muted-foreground">Loading lead…</p>;
   }
@@ -213,6 +246,14 @@ function LeadDetailPage() {
               <Row label="Address" value={lead.address} />
               <Row label="Rating" value={lead.google_rating ? `${lead.google_rating} (${lead.review_count ?? 0} reviews)` : null} />
               <Row label="Status" value={statusLabel(lead.lead_status)} />
+              {lead.client_username && <Row label="Client Login" value={lead.client_username} />}
+              {lead.client_password && <Row label="Password" value={lead.client_password} />}
+              {lead.invite_sent_at && (
+                <Row
+                  label="Invite"
+                  value={`Sent ${new Date(lead.invite_sent_at).toLocaleDateString()}`}
+                />
+              )}
             </dl>
             <div className="mt-4 flex items-center justify-between border-t border-border/70 pt-4">
               <span className="label-mono">Opportunity</span>
@@ -242,6 +283,45 @@ function LeadDetailPage() {
                 </li>
               ))}
             </ul>
+          </Panel>
+
+          <Panel>
+            <p className="label-mono">Team Portal Access</p>
+            <div className="mt-3 grid gap-3">
+              <div className="grid gap-1.5">
+                <Label htmlFor="username" className="text-xs text-muted-foreground">Client Username</Label>
+                <Input
+                  id="username"
+                  value={clientUsername}
+                  onChange={(e) => setClientUsername(e.target.value)}
+                  placeholder="e.g., client@business.com"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="password" className="text-xs text-muted-foreground">Temporary Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={clientPassword}
+                  onChange={(e) => setClientPassword(e.target.value)}
+                  placeholder="Generate or set password"
+                />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button size="sm" onClick={saveClientLogin} className="flex-1">
+                  Save Credentials
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={sendInvite}
+                  disabled={!lead?.email}
+                  className="flex-1"
+                >
+                  Send Invite
+                </Button>
+              </div>
+            </div>
           </Panel>
         </div>
 
