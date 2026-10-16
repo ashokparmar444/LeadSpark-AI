@@ -67,10 +67,10 @@ const PHASES = [
 ];
 
 const PLANS = [
-  { name: "Free", price: "$0", blurb: "Kick the tyres", items: ["25 leads / month", "10 AI audits", "3 build prompts", "Demo data mode"] },
-  { name: "Starter", price: "$29", blurb: "Solo operators", items: ["250 leads / month", "100 AI audits", "25 build prompts", "150 outreach drafts"] },
-  { name: "Pro", price: "$79", blurb: "Growing agencies", items: ["1,000 leads / month", "500 AI audits", "150 build prompts", "Team workspace"], featured: true },
-  { name: "Agency", price: "$199", blurb: "Full pipeline", items: ["5,000 leads / month", "2,500 AI audits", "Unlimited seats", "Priority processing"] },
+  { name: "Free", price: "₹0", blurb: "Kick the tyres", items: ["25 leads / month", "10 AI audits", "3 build prompts", "Demo data mode"] },
+  { name: "Starter", price: "₹2,499", blurb: "Solo operators", items: ["250 leads / month", "100 AI audits", "25 build prompts", "150 outreach drafts"] },
+  { name: "Pro", price: "₹6,999", blurb: "Growing agencies", items: ["1,000 leads / month", "500 AI audits", "150 build prompts", "Team workspace"], featured: true },
+  { name: "Agency", price: "₹16,999", blurb: "Full pipeline", items: ["5,000 leads / month", "2,500 AI audits", "Unlimited seats", "Priority processing"] },
 ];
 
 function Landing() {
